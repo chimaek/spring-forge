@@ -1,0 +1,16 @@
+.vscode/**
+.vscode-test/**
+src/**
+out/**
+node_modules/**
+docs/**
+.gitignore
+tsconfig.json
+esbuild.js
+CLAUDE.md
+**/*.ts
+**/*.png
+**/*.jpg
+*.vsix
+!dist/**
+dist/**/*.map

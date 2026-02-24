@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.vsix
+.vscode-test/
+out/
+docs/
+CLAUDE.md
+*.png
+*.jpg
