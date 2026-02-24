@@ -1,0 +1,106 @@
+{
+  "name": "spring-forge",
+  "displayName": "Spring Initializr UI",
+  "description": "Visual Spring project generator powered by official start.spring.io API",
+  "version": "0.1.0",
+  "publisher": "chimaek",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chimaek/spring-forge"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "spring",
+    "spring boot",
+    "initializr",
+    "java",
+    "kotlin",
+    "project generator"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "spring-forge.open",
+        "title": "Spring: New Project (Initializr UI)",
+        "icon": "$(add)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "spring-forge.open",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "spring-forge",
+          "title": "Spring Initializr",
+          "icon": "resources/icon-sprout-stamp.svg"
+        }
+      ]
+    },
+    "views": {
+      "spring-forge": [
+        {
+          "id": "spring-forge.welcome",
+          "name": "Spring Initializr"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "spring-forge.welcome",
+        "contents": "Spring Boot 프로젝트를 생성합니다.\n[New Spring Project](command:spring-forge.open)\nCtrl+Shift+S (Mac: Cmd+Shift+S)로도 열 수 있습니다."
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "spring-forge.open",
+          "when": "view == spring-forge.welcome",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "check-types": "tsc --noEmit",
+    "compile": "npm run check-types && node esbuild.js",
+    "vscode:prepublish": "npm run package",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "package": "npm run clean && npm run check-types && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "pretest": "npm run compile-tests",
+    "test": "node ./out/test/runTest.js",
+    "test:unit": "mocha --require ts-node/register src/test/suite/**/*.test.ts",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^28.0.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.0",
+    "@types/unzipper": "^0.10.9",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.3.8",
+    "esbuild": "^0.19.0",
+    "eslint": "^8.56.0",
+    "jsdom": "^28.1.0",
+    "mocha": "^10.2.0",
+    "nock": "^13.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.0",
+    "unzipper": "^0.12.0"
+  }
+}
