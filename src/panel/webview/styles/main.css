@@ -1,0 +1,273 @@
+:root {
+  --spring-green: #6db33f;
+  --spring-dark: #3d5a1e;
+}
+
+body {
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 2열 레이아웃 */
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  height: calc(100vh - 45px);
+}
+
+.panel-left {
+  border-right: 1px solid var(--vscode-panel-border);
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-right {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+.header-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--spring-green);
+}
+.refresh-btn {
+  background: none;
+  border: 1px solid var(--vscode-button-border, transparent);
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+.refresh-btn:hover { opacity: 1; }
+
+/* 섹션 제목 */
+.section-title {
+  font-size: 0.75em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+/* 라디오 그룹 */
+.option-group { display: flex; flex-direction: column; gap: 4px; }
+.option-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  cursor: pointer;
+}
+.option-group label:hover { color: var(--spring-green); }
+input[type="radio"]:checked + span { color: var(--spring-green); font-weight: 600; }
+
+/* 텍스트 입력 */
+.meta-input {
+  width: 100%;
+  padding: 5px 8px;
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, transparent);
+  color: var(--vscode-input-foreground);
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+}
+.meta-input:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder);
+}
+.meta-label {
+  display: block;
+  font-size: 0.82em;
+  opacity: 0.7;
+  margin-bottom: 3px;
+}
+
+/* 드롭다운 */
+select.meta-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+  cursor: pointer;
+}
+
+/* 의존성 검색창 */
+.dep-search-input {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, transparent);
+  color: var(--vscode-input-foreground);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  margin-bottom: 10px;
+}
+
+/* 의존성 리스트 */
+.dep-list-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+}
+
+details { margin-bottom: 4px; }
+details[open] { margin-bottom: 12px; }
+
+.dep-group-summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+  user-select: none;
+  list-style: none;
+  color: var(--spring-green);
+}
+.dep-group-summary::-webkit-details-marker { display: none; }
+.dep-group-summary::before {
+  content: "\25B6  ";
+  font-size: 0.7em;
+  transition: transform 0.15s;
+}
+details[open] .dep-group-summary::before { content: "\25BC  "; }
+
+.dep-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1px;
+}
+.dep-item:hover { background: var(--vscode-list-hoverBackground); }
+.dep-item--focused {
+  background: var(--vscode-list-focusBackground, var(--vscode-list-hoverBackground));
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+.dep-item:focus { outline: none; }
+.dep-item--incompatible { opacity: 0.4; cursor: not-allowed; }
+
+.dep-info { display: flex; flex-direction: column; gap: 2px; }
+.dep-name { font-weight: 500; }
+.dep-desc { font-size: 0.8em; opacity: 0.65; }
+
+/* 뱃지 영역 */
+.badges-area {
+  padding: 10px 16px;
+  border-top: 1px solid var(--vscode-panel-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 44px;
+  align-items: center;
+}
+.dep-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--spring-green);
+  color: white;
+  padding: 2px 8px 2px 10px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+}
+.badge-remove {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.1em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.badge-remove:hover { color: white; }
+.no-deps { font-size: 0.85em; opacity: 0.5; }
+
+/* 생성 버튼 */
+.generate-area {
+  padding: 12px 16px;
+  border-top: 1px solid var(--vscode-panel-border);
+}
+.generate-btn {
+  width: 100%;
+  background: var(--spring-green);
+  color: white;
+  border: none;
+  padding: 10px 0;
+  border-radius: 5px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.generate-btn:hover:not(:disabled) { background: var(--spring-dark); }
+.generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 로딩 */
+.loading-screen, .error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 16px;
+  opacity: 0.7;
+}
+.spinner {
+  width: 28px; height: 28px;
+  border: 3px solid var(--vscode-panel-border);
+  border-top-color: var(--spring-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-icon { font-size: 2em; }
+
+/* 호환성 경고 */
+.compat-warning {
+  background: var(--vscode-inputValidation-warningBackground, #664d00);
+  border: 1px solid var(--vscode-inputValidation-warningBorder, #b89500);
+  color: var(--vscode-inputValidation-warningForeground, #fff);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  margin-bottom: 8px;
+  animation: fadeOut 4s forwards;
+}
+@keyframes fadeOut { 0%,70%{opacity:1} 100%{opacity:0} }
+
+.no-result {
+  text-align: center;
+  opacity: 0.5;
+  padding: 20px;
+}
