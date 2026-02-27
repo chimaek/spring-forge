@@ -60,3 +60,8 @@ export interface GenerateOptions {
   javaVersion: string;
   dependencies: string[];
 }
+
+export interface Preset {
+  name: string;
+  options: Omit<GenerateOptions, "bootVersion">;
+}
