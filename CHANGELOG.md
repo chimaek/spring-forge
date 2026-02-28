@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Smart recommendations: suggests commonly paired dependencies based on current selection
 - Pre-generation preview: pom.xml / build.gradle preview modal before project creation
 
+### Changed
+
+- Keyboard shortcut changed from `Ctrl+Shift+S` / `Cmd+Shift+S` to `Ctrl+Alt+S` / `Cmd+Option+S` to avoid conflicts with VS Code built-in Save All / Save As
+
 ### Fixed
 
 - Project directory not found after generation on Windows (path verification + fallback detection)

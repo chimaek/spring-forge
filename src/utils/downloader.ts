@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import { Readable } from "stream";
 import { Extract } from "unzipper";
 
@@ -14,10 +15,8 @@ export class Downloader {
 
   /** 압축 해제 후 실제 생성된 프로젝트 디렉터리를 찾는다 */
   static findProjectDir(targetDir: string, artifactId: string): string | null {
-    const p = require("path");
-
     // 1) 기대 경로가 존재하면 그대로 반환
-    const joined = p.join(targetDir, artifactId);
+    const joined = path.join(targetDir, artifactId);
     if (fs.existsSync(joined)) {
       return joined;
     }
@@ -29,8 +28,8 @@ export class Downloader {
         .filter((e) => e.isDirectory())
         .map((e) => ({
           name: e.name,
-          path: p.join(targetDir, e.name),
-          mtime: fs.statSync(p.join(targetDir, e.name)).mtimeMs,
+          path: path.join(targetDir, e.name),
+          mtime: fs.statSync(path.join(targetDir, e.name)).mtimeMs,
         }))
         .sort((a, b) => b.mtime - a.mtime);
 

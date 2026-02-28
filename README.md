@@ -38,13 +38,13 @@ The existing `vscode-spring-initializr` extension uses a QuickPick (CLI-style) f
 
 1. Click the Spring Forge icon in the Activity Bar (left sidebar), or
 2. Open Command Palette (`Ctrl+Shift+P`) and run `Spring: New Project (Initializr UI)`, or
-3. Use the keyboard shortcut `Ctrl+Shift+S` (Mac: `Cmd+Shift+S`)
+3. Use the keyboard shortcut `Ctrl+Alt+S` (Mac: `Cmd+Option+S`)
 
 ### Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+Shift+S` | Open Spring Forge |
+| `Ctrl+Alt+S` | Open Spring Forge |
 | `/` | Focus dependency search |
 | `Arrow Up/Down` | Navigate dependency list |
 | `Enter` / `Space` | Toggle selected dependency |
@@ -151,13 +151,13 @@ npx @vscode/vsce package --no-dependencies
 
 1. Activity Bar(왼쪽 사이드바)의 Spring Forge 아이콘 클릭, 또는
 2. 명령 팔레트(`Ctrl+Shift+P`)에서 `Spring: New Project (Initializr UI)` 실행, 또는
-3. 단축키 `Ctrl+Shift+S` (Mac: `Cmd+Shift+S`)
+3. 단축키 `Ctrl+Alt+S` (Mac: `Cmd+Option+S`)
 
 ### 키보드 단축키
 
 | 키 | 동작 |
 |----|------|
-| `Ctrl+Shift+S` | Spring Forge 열기 |
+| `Ctrl+Alt+S` | Spring Forge 열기 |
 | `/` | 의존성 검색창 포커스 |
 | `위/아래 화살표` | 의존성 목록 탐색 |
 | `Enter` / `Space` | 의존성 선택/해제 |
