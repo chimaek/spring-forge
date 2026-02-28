@@ -22,10 +22,20 @@ The existing `vscode-spring-initializr` extension uses a QuickPick (CLI-style) f
 - **Favorite presets** — Save and load your frequently used project configurations (groupId, dependencies, etc.) with one click.
 - **Dependency popularity** — "Popular" tags on commonly used dependencies. Smart recommendations based on your current selection.
 - **Pre-generation preview** — Preview the generated `pom.xml` or `build.gradle` before creating the project.
+- **Recent history** — Last 5 generated projects saved for quick reload from the header dropdown.
 - **Post-generation setup** — Detects Maven/Gradle and offers to run the project. Suggests Java Extension Pack and Spring Boot Extension Pack if not installed.
 - **Activity Bar icon** — One-click access from the sidebar.
 - **Theme support** — Adapts to dark, light, and high-contrast themes using VS Code CSS variables.
+- **Custom server URL** — Configure `springForge.initializrUrl` to use a private/enterprise Initializr server instead of start.spring.io.
 - **Lightweight** — ~60KB VSIX. No React, no external CDN. Vanilla TypeScript + CSP-compliant.
+
+## Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `springForge.initializrUrl` | `https://start.spring.io` | Base URL of the Spring Initializr server |
+
+To use a custom Initializr server, open **Settings** (`Ctrl+,`) and search for `springForge`.
 
 ## Getting Started
 
@@ -52,7 +62,7 @@ The existing `vscode-spring-initializr` extension uses a QuickPick (CLI-style) f
 
 ## Architecture
 
-```
+```text
 Extension Host (Node.js)          Webview (Browser)
 ┌─────────────────────┐           ┌──────────────────────┐
 │ InitializrClient     │           │ ProjectMeta          │
@@ -135,10 +145,20 @@ npx @vscode/vsce package --no-dependencies
 - **즐겨찾기 프리셋** — 자주 쓰는 프로젝트 설정(groupId, 의존성 조합 등)을 저장하고 원클릭 로드.
 - **의존성 인기도 표시** — 자주 사용되는 의존성에 "Popular" 태그. 현재 선택에 기반한 스마트 추천.
 - **생성 전 미리보기** — 프로젝트 생성 전 `pom.xml` / `build.gradle` 미리보기 모달.
+- **최근 생성 히스토리** — 최근 생성한 프로젝트 5개를 저장하여 헤더 드롭다운에서 빠르게 재사용.
 - **프로젝트 생성 후 자동 설정** — Maven/Gradle 자동 감지 후 실행 명령어 제안. Java Extension Pack, Spring Boot Extension Pack 미설치 시 추천.
 - **Activity Bar 아이콘** — 사이드바에서 클릭 한 번으로 실행.
 - **테마 지원** — 다크/라이트/하이콘트라스트 테마 자동 대응.
+- **커스텀 서버 URL** — `springForge.initializrUrl` 설정으로 사내/프라이빗 Initializr 서버 연동 가능.
 - **경량** — VSIX ~60KB. React 없이 Vanilla TypeScript + CSP 준수.
+
+## 설정
+
+| 설정 | 기본값 | 설명 |
+|------|--------|------|
+| `springForge.initializrUrl` | `https://start.spring.io` | Spring Initializr 서버 기본 URL |
+
+사내 Initializr 서버를 사용하려면 **설정** (`Ctrl+,`)에서 `springForge`를 검색하세요.
 
 ## 시작하기
 

@@ -2,18 +2,21 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import { InitializrClient } from "../api/InitializrClient";
-import { GenerateOptions, Preset } from "../api/types";
+import { GenerateOptions, Preset, HistoryRecord } from "../api/types";
 import { Downloader } from "../utils/downloader";
 import { getWebviewContent } from "./webviewContent";
 
 const PRESETS_KEY = "springForge.presets";
+const HISTORY_KEY = "springForge.history";
+const MAX_HISTORY = 5;
 
 type ExtensionToWebviewMessage =
   | { command: "metadata"; payload: unknown }
   | { command: "loading"; payload: boolean }
   | { command: "generating"; payload: boolean }
   | { command: "error"; payload: string }
-  | { command: "presets"; payload: Preset[] };
+  | { command: "presets"; payload: Preset[] }
+  | { command: "history"; payload: HistoryRecord[] };
 
 type WebviewToExtensionMessage =
   | { command: "ready" }
@@ -21,13 +24,15 @@ type WebviewToExtensionMessage =
   | { command: "refresh" }
   | { command: "savePreset"; payload: Preset }
   | { command: "deletePreset"; payload: string }
-  | { command: "loadPresets" };
+  | { command: "loadPresets" }
+  | { command: "loadHistory" };
 
 export class InitializrPanel {
   private static currentPanel: InitializrPanel | undefined;
   private readonly panel: vscode.WebviewPanel;
   private readonly context: vscode.ExtensionContext;
   private disposables: vscode.Disposable[] = [];
+  private baseUrl: string;
 
   static createOrShow(context: vscode.ExtensionContext) {
     const column = vscode.window.activeTextEditor?.viewColumn;
@@ -59,12 +64,34 @@ export class InitializrPanel {
   ) {
     this.panel = panel;
     this.context = context;
+    this.baseUrl = this.readBaseUrl();
     this.panel.webview.html = getWebviewContent(
       this.panel.webview,
       context.extensionUri
     );
     this.setupMessageHandlers();
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
+    this.watchConfigChanges();
+  }
+
+  private readBaseUrl(): string {
+    return vscode.workspace
+      .getConfiguration("springForge")
+      .get<string>("initializrUrl", "https://start.spring.io");
+  }
+
+  private watchConfigChanges() {
+    const watcher = vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("springForge.initializrUrl")) {
+        const newUrl = this.readBaseUrl();
+        if (newUrl !== this.baseUrl) {
+          this.baseUrl = newUrl;
+          InitializrClient.invalidateCache();
+          this.sendMetadata();
+        }
+      }
+    });
+    this.disposables.push(watcher);
   }
 
   private setupMessageHandlers() {
@@ -74,6 +101,7 @@ export class InitializrPanel {
           case "ready":
             await this.sendMetadata();
             this.sendPresets();
+            this.sendHistory();
             break;
 
           case "generate":
@@ -96,6 +124,10 @@ export class InitializrPanel {
           case "loadPresets":
             this.sendPresets();
             break;
+
+          case "loadHistory":
+            this.sendHistory();
+            break;
         }
       },
       null,
@@ -106,7 +138,7 @@ export class InitializrPanel {
   private async sendMetadata() {
     try {
       this.post({ command: "loading", payload: true });
-      const metadata = await InitializrClient.fetchMetadata();
+      const metadata = await InitializrClient.fetchMetadata(this.baseUrl);
       this.post({ command: "metadata", payload: metadata });
     } catch (err) {
       console.error("[Spring Initializr] 메타데이터 조회 실패:", err);
@@ -160,7 +192,7 @@ export class InitializrPanel {
     try {
       this.post({ command: "generating", payload: true });
 
-      const url = InitializrClient.buildGenerateUrl(options);
+      const url = InitializrClient.buildGenerateUrl(options, this.baseUrl);
       const zipBuffer = await InitializrClient.downloadZip(url);
       await Downloader.extractZip(zipBuffer, targetDir);
 
@@ -193,6 +225,8 @@ export class InitializrPanel {
           { uri: vscode.Uri.file(projectDir) }
         );
       }
+
+      this.addHistory(options);
 
       // Post-project auto-setup
       await this.postProjectSetup(projectDir, options);
@@ -277,6 +311,27 @@ export class InitializrPanel {
         );
       }
     }
+  }
+
+  private sendHistory() {
+    const history = this.context.globalState.get<HistoryRecord[]>(HISTORY_KEY, []);
+    this.post({ command: "history", payload: history });
+  }
+
+  private addHistory(options: GenerateOptions) {
+    const history = this.context.globalState.get<HistoryRecord[]>(HISTORY_KEY, []);
+    const record: HistoryRecord = {
+      options,
+      generatedAt: new Date().toISOString(),
+    };
+    const filtered = history.filter(
+      (h) =>
+        !(h.options.groupId === options.groupId &&
+          h.options.artifactId === options.artifactId)
+    );
+    const updated = [record, ...filtered].slice(0, MAX_HISTORY);
+    this.context.globalState.update(HISTORY_KEY, updated);
+    this.sendHistory();
   }
 
   private post(message: ExtensionToWebviewMessage) {

@@ -1,34 +1,37 @@
 import * as https from "https";
 import { InitializrMetadata, GenerateOptions } from "./types";
 
-const METADATA_URL = "https://start.spring.io/metadata/client";
-const GENERATOR_URL = "https://start.spring.io/starter.zip";
+const DEFAULT_BASE_URL = "https://start.spring.io";
 const ACCEPT_HEADER = "application/vnd.initializr.v2.2+json";
 
 export class InitializrClient {
   private static metadataCache: {
     data: InitializrMetadata;
     fetchedAt: number;
+    baseUrl: string;
   } | null = null;
 
   private static readonly CACHE_TTL_MS = 60 * 60 * 1000;
 
-  static async fetchMetadata(): Promise<InitializrMetadata> {
+  static async fetchMetadata(baseUrl?: string): Promise<InitializrMetadata> {
+    const url = baseUrl || DEFAULT_BASE_URL;
     const now = Date.now();
     if (
       this.metadataCache &&
+      this.metadataCache.baseUrl === url &&
       now - this.metadataCache.fetchedAt < this.CACHE_TTL_MS
     ) {
       return this.metadataCache.data;
     }
 
-    const raw = await this.get(METADATA_URL, { Accept: ACCEPT_HEADER });
+    const raw = await this.get(`${url}/metadata/client`, { Accept: ACCEPT_HEADER });
     const data: InitializrMetadata = JSON.parse(raw);
-    this.metadataCache = { data, fetchedAt: now };
+    this.metadataCache = { data, fetchedAt: now, baseUrl: url };
     return data;
   }
 
-  static buildGenerateUrl(options: GenerateOptions): string {
+  static buildGenerateUrl(options: GenerateOptions, baseUrl?: string): string {
+    const url = baseUrl || DEFAULT_BASE_URL;
     const params = new URLSearchParams({
       type: options.type,
       language: options.language,
@@ -42,7 +45,7 @@ export class InitializrClient {
       javaVersion: options.javaVersion,
       dependencies: options.dependencies.join(","),
     });
-    return `${GENERATOR_URL}?${params.toString()}`;
+    return `${url}/starter.zip?${params.toString()}`;
   }
 
   static downloadZip(url: string): Promise<Buffer> {

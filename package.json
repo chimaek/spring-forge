@@ -71,6 +71,18 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "Spring Forge",
+      "properties": {
+        "springForge.initializrUrl": {
+          "type": "string",
+          "default": "https://start.spring.io",
+          "description": "Base URL of the Spring Initializr server (e.g., https://start.spring.io or a custom enterprise server).",
+          "pattern": "^https://.+",
+          "patternErrorMessage": "Must be a valid HTTPS URL"
+        }
+      }
     }
   },
   "scripts": {

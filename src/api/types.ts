@@ -65,3 +65,8 @@ export interface Preset {
   name: string;
   options: Omit<GenerateOptions, "bootVersion">;
 }
+
+export interface HistoryRecord {
+  options: GenerateOptions;
+  generatedAt: string;
+}

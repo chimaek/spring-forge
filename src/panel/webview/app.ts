@@ -1,4 +1,4 @@
-import type { InitializrMetadata, GenerateOptions, Preset } from "../../api/types";
+import type { InitializrMetadata, GenerateOptions, Preset, HistoryRecord } from "../../api/types";
 import { createProjectMeta, ProjectMetaState } from "./components/ProjectMeta";
 import { DependencySearch } from "./components/DependencySearch";
 import { createGenerateButton } from "./components/GenerateButton";
@@ -8,6 +8,7 @@ interface VsCodeApi {
 }
 
 let currentPresets: Preset[] = [];
+let currentHistory: HistoryRecord[] = [];
 let metaState: ProjectMetaState;
 let depSearch: DependencySearch;
 let selectedDeps: string[] = [];
@@ -29,6 +30,9 @@ export function renderApp(
   header.innerHTML = `
     <span class="header-title">Spring Initializr</span>
     <div class="header-actions">
+      <select class="preset-select" id="historySelect">
+        <option value="">-- Recent --</option>
+      </select>
       <select class="preset-select" id="presetSelect">
         <option value="">-- Preset --</option>
       </select>
@@ -167,6 +171,16 @@ export function renderApp(
     presetSelect.value = "";
   });
 
+  // History select
+  const historySelect = document.getElementById("historySelect") as HTMLSelectElement;
+  historySelect.addEventListener("change", () => {
+    const idx = parseInt(historySelect.value, 10);
+    if (isNaN(idx)) return;
+    const record = currentHistory[idx];
+    if (record) applyHistoryRecord(record);
+    historySelect.value = "";
+  });
+
   // Global "/" shortcut
   document.addEventListener("keydown", (e) => {
     const target = e.target as HTMLElement;
@@ -180,8 +194,9 @@ export function renderApp(
     }
   });
 
-  // Request presets
+  // Request presets & history
   vscode.postMessage({ command: "loadPresets" });
+  vscode.postMessage({ command: "loadHistory" });
 }
 
 export function updatePresets(presets: Preset[]) {
@@ -201,6 +216,23 @@ export function updatePresets(presets: Preset[]) {
     delOpt.value = "__delete__";
     delOpt.textContent = "프리셋 삭제...";
     select.appendChild(delOpt);
+  }
+}
+
+export function updateHistory(history: HistoryRecord[]) {
+  currentHistory = history;
+  const select = document.getElementById("historySelect") as HTMLSelectElement | null;
+  if (!select) return;
+
+  select.innerHTML = '<option value="">-- Recent --</option>';
+  for (let i = 0; i < history.length; i++) {
+    const h = history[i];
+    const date = new Date(h.generatedAt);
+    const label = `${h.options.artifactId} (${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")})`;
+    const opt = document.createElement("option");
+    opt.value = String(i);
+    opt.textContent = label;
+    select.appendChild(opt);
   }
 }
 
@@ -234,6 +266,35 @@ function applyPreset(preset: Preset) {
   metaState.packaging = opts.packaging;
   metaState.javaVersion = opts.javaVersion;
 
+  depSearch.setSelectedIds(opts.dependencies);
+  selectedDeps = opts.dependencies;
+}
+
+function applyHistoryRecord(record: HistoryRecord) {
+  const opts = record.options;
+  setRadio("buildType", opts.type);
+  setRadio("language", opts.language);
+  setRadio("packaging", opts.packaging);
+  setSelectValue("bootVersion", opts.bootVersion);
+  setSelectValue("javaVersion", opts.javaVersion);
+  setTextInput("Group", opts.groupId);
+  setTextInput("Artifact", opts.artifactId);
+  setTextInput("Name", opts.name);
+  setTextInput("Description", opts.description);
+  setTextInput("Package Name", opts.packageName);
+
+  metaState.type = opts.type;
+  metaState.language = opts.language;
+  metaState.bootVersion = opts.bootVersion;
+  metaState.groupId = opts.groupId;
+  metaState.artifactId = opts.artifactId;
+  metaState.name = opts.name;
+  metaState.description = opts.description;
+  metaState.packageName = opts.packageName;
+  metaState.packaging = opts.packaging;
+  metaState.javaVersion = opts.javaVersion;
+
+  depSearch.updateBootVersion(opts.bootVersion);
   depSearch.setSelectedIds(opts.dependencies);
   selectedDeps = opts.dependencies;
 }
