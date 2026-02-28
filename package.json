@@ -36,8 +36,8 @@
     "keybindings": [
       {
         "command": "spring-forge.open",
-        "key": "ctrl+shift+s",
-        "mac": "cmd+shift+s"
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s"
       }
     ],
     "viewsContainers": {
@@ -60,7 +60,7 @@
     "viewsWelcome": [
       {
         "view": "spring-forge.welcome",
-        "contents": "Spring Boot 프로젝트를 생성합니다.\n[New Spring Project](command:spring-forge.open)\nCtrl+Shift+S (Mac: Cmd+Shift+S)로도 열 수 있습니다."
+        "contents": "Spring Boot 프로젝트를 생성합니다.\n[New Spring Project](command:spring-forge.open)\nCtrl+Alt+S (Mac: Cmd+Option+S)로도 열 수 있습니다."
       }
     ],
     "menus": {

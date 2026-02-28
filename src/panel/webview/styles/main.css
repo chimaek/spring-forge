@@ -271,3 +271,138 @@ details[open] .dep-group-summary::before { content: "\25BC  "; }
   opacity: 0.5;
   padding: 20px;
 }
+
+/* 헤더 액션 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.preset-select {
+  padding: 3px 6px;
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, transparent);
+  color: var(--vscode-input-foreground);
+  border-radius: 3px;
+  font-size: 0.82em;
+  cursor: pointer;
+}
+.header-btn {
+  background: none;
+  border: 1px solid var(--vscode-button-border, transparent);
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.82em;
+  opacity: 0.7;
+}
+.header-btn:hover { opacity: 1; }
+
+/* Popular 태그 */
+.popular-tag {
+  display: inline-block;
+  background: var(--spring-green);
+  color: white;
+  font-size: 0.65em;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.03em;
+}
+
+/* 추천 영역 */
+.rec-section {
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--vscode-panel-border);
+}
+.rec-title {
+  font-size: 0.75em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--spring-green);
+  margin-bottom: 6px;
+}
+
+/* 버튼 행 */
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+.btn-row .generate-btn {
+  flex: 1;
+}
+.preview-btn {
+  background: none;
+  border: 1px solid var(--spring-green);
+  color: var(--spring-green);
+  padding: 10px 16px;
+  border-radius: 5px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.preview-btn:hover {
+  background: var(--spring-green);
+  color: white;
+}
+
+/* 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+.modal-title {
+  font-weight: 600;
+  color: var(--spring-green);
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--vscode-editor-foreground);
+  font-size: 1.4em;
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 0 4px;
+}
+.modal-close:hover { opacity: 1; }
+.preview-code {
+  padding: 16px;
+  overflow: auto;
+  flex: 1;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.85em;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre;
+  color: var(--vscode-editor-foreground);
+}

@@ -2,8 +2,8 @@
 // Node.js API, vscode 모듈 사용 불가.
 // Extension Host와의 통신은 acquireVsCodeApi().postMessage만 가능.
 
-import { renderApp } from "./app";
-import type { InitializrMetadata } from "../../api/types";
+import { renderApp, updatePresets } from "./app";
+import type { InitializrMetadata, Preset } from "../../api/types";
 
 declare function acquireVsCodeApi(): {
   postMessage: (msg: object) => void;
@@ -61,6 +61,10 @@ window.addEventListener("message", (event) => {
       errorScreen.appendChild(retryBtn);
 
       appEl.appendChild(errorScreen);
+      break;
+    }
+    case "presets": {
+      updatePresets(message.payload as Preset[]);
       break;
     }
     case "generating": {

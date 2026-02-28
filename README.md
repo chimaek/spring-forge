@@ -19,6 +19,9 @@ The existing `vscode-spring-initializr` extension uses a QuickPick (CLI-style) f
 - **Dependency search** — Search across name, ID, and description simultaneously.
 - **Version compatibility** — Automatically disables incompatible dependencies when you change the Boot version, with a warning message.
 - **Keyboard-first UX** — `/` to focus search, arrow keys to navigate, Enter to toggle, Escape to return.
+- **Favorite presets** — Save and load your frequently used project configurations (groupId, dependencies, etc.) with one click.
+- **Dependency popularity** — "Popular" tags on commonly used dependencies. Smart recommendations based on your current selection.
+- **Pre-generation preview** — Preview the generated `pom.xml` or `build.gradle` before creating the project.
 - **Post-generation setup** — Detects Maven/Gradle and offers to run the project. Suggests Java Extension Pack and Spring Boot Extension Pack if not installed.
 - **Activity Bar icon** — One-click access from the sidebar.
 - **Theme support** — Adapts to dark, light, and high-contrast themes using VS Code CSS variables.
@@ -129,6 +132,9 @@ npx @vscode/vsce package --no-dependencies
 - **의존성 검색** — 이름, ID, 설명 세 필드를 동시에 검색.
 - **버전 호환성 검증** — Boot 버전 변경 시 비호환 의존성 자동 해제 + 경고 메시지.
 - **키보드 중심 UX** — `/`로 검색 포커스, 화살표 키로 탐색, Enter로 선택 토글, Escape로 복귀.
+- **즐겨찾기 프리셋** — 자주 쓰는 프로젝트 설정(groupId, 의존성 조합 등)을 저장하고 원클릭 로드.
+- **의존성 인기도 표시** — 자주 사용되는 의존성에 "Popular" 태그. 현재 선택에 기반한 스마트 추천.
+- **생성 전 미리보기** — 프로젝트 생성 전 `pom.xml` / `build.gradle` 미리보기 모달.
 - **프로젝트 생성 후 자동 설정** — Maven/Gradle 자동 감지 후 실행 명령어 제안. Java Extension Pack, Spring Boot Extension Pack 미설치 시 추천.
 - **Activity Bar 아이콘** — 사이드바에서 클릭 한 번으로 실행.
 - **테마 지원** — 다크/라이트/하이콘트라스트 테마 자동 대응.

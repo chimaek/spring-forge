@@ -5,6 +5,19 @@ All notable changes to Spring Forge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Favorite presets: save/load project configurations (groupId, dependencies, etc.) via globalState
+- Dependency popularity tags: "Popular" badge on frequently used dependencies (web, jpa, security, etc.)
+- Smart recommendations: suggests commonly paired dependencies based on current selection
+- Pre-generation preview: pom.xml / build.gradle preview modal before project creation
+
+### Fixed
+
+- Project directory not found after generation on Windows (path verification + fallback detection)
+
 ## [0.1.0] - 2026-02-25
 
 ### Added
