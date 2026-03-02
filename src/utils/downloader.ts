@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Readable } from "stream";
-import { Extract } from "unzipper";
+import { Extract, Parse } from "unzipper";
 
 export class Downloader {
   static async extractZip(buffer: Buffer, destDir: string): Promise<void> {
@@ -10,6 +10,30 @@ export class Downloader {
       extractor.on("close", resolve);
       extractor.on("error", reject);
       Readable.from(buffer).pipe(extractor);
+    });
+  }
+
+  /** ZIP 버퍼에서 특정 파일의 텍스트 내용을 추출한다 */
+  static async extractFileContent(buffer: Buffer, fileName: string): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      let found = false;
+      const stream = Readable.from(buffer).pipe(Parse());
+
+      stream.on("entry", (entry: { path: string; autodrain: () => void; buffer: () => Promise<Buffer> }) => {
+        if (entry.path === fileName) {
+          found = true;
+          entry.buffer()
+            .then((buf: Buffer) => resolve(buf.toString("utf-8")))
+            .catch(reject);
+        } else {
+          entry.autodrain();
+        }
+      });
+
+      stream.on("close", () => {
+        if (!found) resolve(null);
+      });
+      stream.on("error", reject);
     });
   }
 

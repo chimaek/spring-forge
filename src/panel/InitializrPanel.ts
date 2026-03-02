@@ -16,16 +16,20 @@ type ExtensionToWebviewMessage =
   | { command: "generating"; payload: boolean }
   | { command: "error"; payload: string }
   | { command: "presets"; payload: Preset[] }
-  | { command: "history"; payload: HistoryRecord[] };
+  | { command: "history"; payload: HistoryRecord[] }
+  | { command: "previewContent"; payload: { filename: string; content: string } };
 
 type WebviewToExtensionMessage =
   | { command: "ready" }
   | { command: "generate"; payload: GenerateOptions }
   | { command: "refresh" }
   | { command: "savePreset"; payload: Preset }
+  | { command: "requestSavePreset"; payload: Omit<GenerateOptions, "bootVersion"> }
   | { command: "deletePreset"; payload: string }
+  | { command: "requestDeletePreset" }
   | { command: "loadPresets" }
   | { command: "loadHistory" }
+  | { command: "requestPreview"; payload: GenerateOptions }
   | { command: "openExternalLink"; payload: string };
 
 export class InitializrPanel {
@@ -118,8 +122,16 @@ export class InitializrPanel {
             this.savePreset(message.payload);
             break;
 
+          case "requestSavePreset":
+            this.requestSavePreset(message.payload);
+            break;
+
           case "deletePreset":
             this.deletePreset(message.payload);
+            break;
+
+          case "requestDeletePreset":
+            this.requestDeletePreset();
             break;
 
           case "loadPresets":
@@ -128,6 +140,10 @@ export class InitializrPanel {
 
           case "loadHistory":
             this.sendHistory();
+            break;
+
+          case "requestPreview":
+            this.handlePreview(message.payload);
             break;
 
           case "openExternalLink":
@@ -142,6 +158,53 @@ export class InitializrPanel {
       null,
       this.disposables
     );
+  }
+
+  private async handlePreview(options: GenerateOptions) {
+    try {
+      const isMaven = options.type.includes("maven");
+      const isKotlinDsl = options.type.includes("kotlin");
+      const filename = isMaven ? "pom.xml" : isKotlinDsl ? "build.gradle.kts" : "build.gradle";
+
+      let content: string;
+
+      if (isKotlinDsl) {
+        // /build.gradle 엔드포인트는 type 파라미터를 무시하고 항상 Groovy 문법을 반환하므로
+        // Kotlin DSL은 ZIP에서 build.gradle.kts를 추출해야 정확한 프리뷰를 제공할 수 있다
+        const url = InitializrClient.buildGenerateUrl(options, this.baseUrl);
+        const zipBuffer = await InitializrClient.downloadZip(url);
+        const extracted = await Downloader.extractFileContent(zipBuffer, filename);
+        content = extracted ?? "build.gradle.kts 파일을 찾을 수 없습니다.";
+      } else {
+        const endpoint = isMaven ? "/pom.xml" : "/build.gradle";
+        const params = new URLSearchParams({
+          type: options.type,
+          language: options.language,
+          bootVersion: options.bootVersion,
+          groupId: options.groupId,
+          artifactId: options.artifactId,
+          name: options.name,
+          description: options.description,
+          packageName: options.packageName,
+          packaging: options.packaging,
+          javaVersion: options.javaVersion,
+          dependencies: options.dependencies.join(","),
+        });
+        const url = `${this.baseUrl}${endpoint}?${params.toString()}`;
+        content = await InitializrClient.fetchText(url);
+      }
+
+      this.post({
+        command: "previewContent",
+        payload: { filename, content },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.post({
+        command: "previewContent",
+        payload: { filename: "Error", content: `프리뷰 생성 실패: ${msg}` },
+      });
+    }
   }
 
   private async sendMetadata() {
@@ -178,6 +241,25 @@ export class InitializrPanel {
     this.sendPresets();
   }
 
+  private async requestSavePreset(options: Omit<GenerateOptions, "bootVersion">) {
+    const name = await vscode.window.showInputBox({
+      prompt: "프리셋 이름을 입력하세요",
+      placeHolder: "예: My Web Project",
+    });
+    if (!name || !name.trim()) return;
+    this.savePreset({ name: name.trim(), options });
+  }
+
+  private async requestDeletePreset() {
+    const presets = this.context.globalState.get<Preset[]>(PRESETS_KEY, []);
+    if (presets.length === 0) return;
+    const picked = await vscode.window.showQuickPick(
+      presets.map((p) => p.name),
+      { placeHolder: "삭제할 프리셋을 선택하세요" }
+    );
+    if (picked) this.deletePreset(picked);
+  }
+
   private deletePreset(name: string) {
     const presets = this.context.globalState.get<Preset[]>(PRESETS_KEY, []);
     const filtered = presets.filter((p) => p.name !== name);
@@ -203,17 +285,14 @@ export class InitializrPanel {
 
       const url = InitializrClient.buildGenerateUrl(options, this.baseUrl);
       const zipBuffer = await InitializrClient.downloadZip(url);
-      await Downloader.extractZip(zipBuffer, targetDir);
 
-      const projectDir =
-        Downloader.findProjectDir(targetDir, options.artifactId) ??
-        path.join(targetDir, options.artifactId);
-
+      // Spring Initializr ZIP은 파일을 루트 레벨로 포함하므로
+      // artifactId 하위 디렉터리를 만들어서 그 안에 압축 해제
+      const projectDir = path.join(targetDir, options.artifactId);
       if (!fs.existsSync(projectDir)) {
-        throw new Error(
-          `프로젝트 디렉터리를 찾을 수 없습니다: ${projectDir}`
-        );
+        fs.mkdirSync(projectDir, { recursive: true });
       }
+      await Downloader.extractZip(zipBuffer, projectDir);
 
       const choice = await vscode.window.showInformationMessage(
         `'${options.artifactId}' 프로젝트 생성 완료!`,

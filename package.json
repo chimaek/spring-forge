@@ -2,7 +2,7 @@
   "name": "spring-forge",
   "displayName": "Spring Initializr UI",
   "description": "Visual Spring project generator powered by official start.spring.io API",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "chimaek",
   "license": "MIT",
   "repository": {
@@ -97,7 +97,8 @@
     "pretest": "npm run compile-tests",
     "test": "node ./out/test/runTest.js",
     "test:unit": "mocha --require ts-node/register src/test/suite/**/*.test.ts",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts",
+    "vsix": "node -e \"require('fs').readdirSync('.').filter(f=>f.endsWith('.vsix')).forEach(f=>require('fs').unlinkSync(f))\" && npx @vscode/vsce package --no-dependencies"
   },
   "devDependencies": {
     "@types/jsdom": "^28.0.0",

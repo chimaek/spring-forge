@@ -2,7 +2,7 @@
 // Node.js API, vscode 모듈 사용 불가.
 // Extension Host와의 통신은 acquireVsCodeApi().postMessage만 가능.
 
-import { renderApp, updatePresets, updateHistory } from "./app";
+import { renderApp, updatePresets, updateHistory, showPreviewContent } from "./app";
 import type { InitializrMetadata, Preset, HistoryRecord } from "../../api/types";
 
 declare function acquireVsCodeApi(): {
@@ -69,6 +69,11 @@ window.addEventListener("message", (event) => {
     }
     case "history": {
       updateHistory(message.payload as HistoryRecord[]);
+      break;
+    }
+    case "previewContent": {
+      const { filename, content } = message.payload as { filename: string; content: string };
+      showPreviewContent(filename, content);
       break;
     }
     case "generating": {

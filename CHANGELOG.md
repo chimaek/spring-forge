@@ -5,6 +5,21 @@ All notable changes to Spring Forge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-03-02
+
+### Fixed
+
+- Save Preset / Delete Preset not working: `window.prompt()` blocked by Webview CSP, replaced with `vscode.window.showInputBox()` and `showQuickPick()` via Extension Host
+- History restore false compatibility warning: boot version change event triggered `updateBootVersion` against old dependencies
+- "Open in New Window" opened wrong directory (`src/` instead of project root): ZIP now extracted into `artifactId` subdirectory
+- Build file preview showed inaccurate hardcoded template: now fetches actual `pom.xml` / `build.gradle` from Spring Initializr API
+- Gradle Kotlin DSL preview showed Groovy syntax: `/build.gradle` endpoint ignores `type` param, now extracts `build.gradle.kts` from ZIP for accurate Kotlin DSL preview
+
+### Changed
+
+- Removed non-project build types (Gradle Config, Maven POM) from UI — only full project types are shown
+- Added `npm run vsix` script for VSIX packaging with auto-cleanup of existing files
+
 ## [1.0.1] - 2026-03-02
 
 ### Fixed

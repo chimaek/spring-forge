@@ -12,18 +12,12 @@ let currentHistory: HistoryRecord[] = [];
 let metaState: ProjectMetaState;
 let depSearch: DependencySearch;
 let selectedDeps: string[] = [];
-let currentVscode: VsCodeApi;
-let currentMetadata: InitializrMetadata;
-
 export function renderApp(
   root: HTMLElement,
   metadata: InitializrMetadata,
   vscode: VsCodeApi
 ) {
   root.innerHTML = "";
-  currentVscode = vscode;
-  currentMetadata = metadata;
-
   // Header
   const header = document.createElement("div");
   header.className = "header";
@@ -111,7 +105,24 @@ export function renderApp(
   const previewBtn = document.createElement("button");
   previewBtn.className = "preview-btn";
   previewBtn.textContent = "Preview";
-  previewBtn.addEventListener("click", () => showPreviewModal());
+  previewBtn.addEventListener("click", () => {
+    const options: GenerateOptions = {
+      type: metaState.type,
+      language: metaState.language,
+      bootVersion: metaState.bootVersion,
+      groupId: metaState.groupId,
+      artifactId: metaState.artifactId,
+      name: metaState.name,
+      description: metaState.description,
+      packageName: metaState.packageName,
+      packaging: metaState.packaging,
+      javaVersion: metaState.javaVersion,
+      dependencies: selectedDeps,
+    };
+    previewBtn.disabled = true;
+    previewBtn.textContent = "Loading...";
+    vscode.postMessage({ command: "requestPreview", payload: options });
+  });
   btnRow.appendChild(previewBtn);
 
   createGenerateButton(btnRow, () => {
@@ -138,24 +149,19 @@ export function renderApp(
 
   // Save Preset
   document.getElementById("savePresetBtn")?.addEventListener("click", () => {
-    const name = prompt("프리셋 이름을 입력하세요:");
-    if (!name || !name.trim()) return;
-    const preset: Preset = {
-      name: name.trim(),
-      options: {
-        type: metaState.type,
-        language: metaState.language,
-        groupId: metaState.groupId,
-        artifactId: metaState.artifactId,
-        name: metaState.name,
-        description: metaState.description,
-        packageName: metaState.packageName,
-        packaging: metaState.packaging,
-        javaVersion: metaState.javaVersion,
-        dependencies: selectedDeps,
-      },
+    const options = {
+      type: metaState.type,
+      language: metaState.language,
+      groupId: metaState.groupId,
+      artifactId: metaState.artifactId,
+      name: metaState.name,
+      description: metaState.description,
+      packageName: metaState.packageName,
+      packaging: metaState.packaging,
+      javaVersion: metaState.javaVersion,
+      dependencies: selectedDeps,
     };
-    vscode.postMessage({ command: "savePreset", payload: preset });
+    vscode.postMessage({ command: "requestSavePreset", payload: options });
   });
 
   // Preset select
@@ -164,7 +170,7 @@ export function renderApp(
     const val = presetSelect.value;
     if (val === "__delete__") {
       presetSelect.value = "";
-      showDeletePresetModal();
+      vscode.postMessage({ command: "requestDeletePreset" });
       return;
     }
     if (!val) return;
@@ -242,14 +248,6 @@ export function updateHistory(history: HistoryRecord[]) {
   }
 }
 
-function showDeletePresetModal() {
-  const name = prompt(
-    `삭제할 프리셋 이름:\n${currentPresets.map((p) => `  - ${p.name}`).join("\n")}`
-  );
-  if (!name || !name.trim()) return;
-  currentVscode.postMessage({ command: "deletePreset", payload: name.trim() });
-}
-
 function applyPreset(preset: Preset) {
   const opts = preset.options;
   setRadio("buildType", opts.type);
@@ -281,13 +279,16 @@ function applyHistoryRecord(record: HistoryRecord) {
   setRadio("buildType", opts.type);
   setRadio("language", opts.language);
   setRadio("packaging", opts.packaging);
-  setSelectValue("bootVersion", opts.bootVersion);
   setSelectValue("javaVersion", opts.javaVersion);
   setTextInput("Group", opts.groupId);
   setTextInput("Artifact", opts.artifactId);
   setTextInput("Name", opts.name);
   setTextInput("Description", opts.description);
   setTextInput("Package Name", opts.packageName);
+
+  // Boot 버전은 change 이벤트 없이 직접 설정 (이전 의존성 기준 false warning 방지)
+  const bootSelect = document.querySelector('select[name="bootVersion"]') as HTMLSelectElement | null;
+  if (bootSelect) bootSelect.value = opts.bootVersion;
 
   metaState.type = opts.type;
   metaState.language = opts.language;
@@ -300,8 +301,8 @@ function applyHistoryRecord(record: HistoryRecord) {
   metaState.packaging = opts.packaging;
   metaState.javaVersion = opts.javaVersion;
 
-  depSearch.updateBootVersion(opts.bootVersion);
   depSearch.setSelectedIds(opts.dependencies);
+  depSearch.updateBootVersion(opts.bootVersion);
   selectedDeps = opts.dependencies;
 }
 
@@ -339,11 +340,15 @@ function setTextInput(label: string, value: string) {
   }
 }
 
-function showPreviewModal() {
-  document.getElementById("previewModal")?.remove();
+export function showPreviewContent(filename: string, content: string) {
+  // Preview 버튼 복원
+  const previewBtn = document.querySelector(".preview-btn") as HTMLButtonElement | null;
+  if (previewBtn) {
+    previewBtn.disabled = false;
+    previewBtn.textContent = "Preview";
+  }
 
-  const isMaven = metaState.type.includes("maven");
-  const content = isMaven ? buildPomPreview() : buildGradlePreview();
+  document.getElementById("previewModal")?.remove();
 
   const overlay = document.createElement("div");
   overlay.id = "previewModal";
@@ -355,7 +360,7 @@ function showPreviewModal() {
   const modalHeader = document.createElement("div");
   modalHeader.className = "modal-header";
   modalHeader.innerHTML = `
-    <span class="modal-title">${isMaven ? "pom.xml" : "build.gradle"} Preview</span>
+    <span class="modal-title">${filename} Preview</span>
     <button class="modal-close" id="modalCloseBtn">&times;</button>
   `;
   modal.appendChild(modalHeader);
@@ -378,70 +383,4 @@ function showPreviewModal() {
       document.removeEventListener("keydown", handler);
     }
   });
-}
-
-function buildPomPreview(): string {
-  const deps = selectedDeps.map((id) => {
-    const dep = currentMetadata.dependencies.values
-      .flatMap((g) => g.values).find((d) => d.id === id);
-    return `        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-${id}</artifactId>
-        </dependency><!-- ${dep?.name ?? id} -->`;
-  });
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<project>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>${metaState.bootVersion}</version>
-    </parent>
-
-    <groupId>${metaState.groupId}</groupId>
-    <artifactId>${metaState.artifactId}</artifactId>
-    <name>${metaState.name}</name>
-    <description>${metaState.description}</description>
-
-    <properties>
-        <java.version>${metaState.javaVersion}</java.version>
-    </properties>
-
-    <dependencies>
-${deps.join("\n")}
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-</project>`;
-}
-
-function buildGradlePreview(): string {
-  const deps = selectedDeps.map((id) => {
-    const dep = currentMetadata.dependencies.values
-      .flatMap((g) => g.values).find((d) => d.id === id);
-    return `    implementation 'org.springframework.boot:spring-boot-starter-${id}' // ${dep?.name ?? id}`;
-  });
-
-  return `plugins {
-    id 'java'
-    id 'org.springframework.boot'
-    id 'io.spring.dependency-management'
-}
-
-group = '${metaState.groupId}'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(${metaState.javaVersion})
-    }
-}
-
-dependencies {
-${deps.join("\n")}
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}`;
 }

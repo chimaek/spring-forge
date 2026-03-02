@@ -88,6 +88,29 @@ export class InitializrClient {
     });
   }
 
+  /** 텍스트 콘텐츠를 반환하는 GET 요청 (302 리다이렉트 처리) */
+  static fetchText(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      https
+        .get(url, (res) => {
+          if (res.statusCode === 302 && res.headers.location) {
+            this.fetchText(res.headers.location).then(resolve).catch(reject);
+            return;
+          }
+          if (res.statusCode !== 200) {
+            reject(new Error(`HTTP ${res.statusCode}: 요청 실패`));
+            return;
+          }
+          let data = "";
+          res.setEncoding("utf8");
+          res.on("data", (chunk) => (data += chunk));
+          res.on("end", () => resolve(data));
+          res.on("error", reject);
+        })
+        .on("error", reject);
+    });
+  }
+
   static invalidateCache(): void {
     this.metadataCache = null;
   }

@@ -25,7 +25,7 @@ export function createProjectMeta(
     createRadioGroup(
       "빌드 타입",
       "buildType",
-      metadata.type.values,
+      metadata.type.values.filter((v) => v.id.includes("project")),
       state.type,
       (val) => {
         state.type = val;
