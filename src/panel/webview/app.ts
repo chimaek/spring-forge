@@ -99,6 +99,8 @@ export function renderApp(
   depSearch = new DependencySearch(depListWrapper, badgesArea, searchInput);
   depSearch.initialize(metadata.dependencies.values, metaState.bootVersion, (ids) => {
     selectedDeps = ids;
+  }, (url) => {
+    vscode.postMessage({ command: "openExternalLink", payload: url });
   });
 
   // Button row: Preview + Generate

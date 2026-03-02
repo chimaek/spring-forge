@@ -25,7 +25,8 @@ type WebviewToExtensionMessage =
   | { command: "savePreset"; payload: Preset }
   | { command: "deletePreset"; payload: string }
   | { command: "loadPresets" }
-  | { command: "loadHistory" };
+  | { command: "loadHistory" }
+  | { command: "openExternalLink"; payload: string };
 
 export class InitializrPanel {
   private static currentPanel: InitializrPanel | undefined;
@@ -127,6 +128,10 @@ export class InitializrPanel {
 
           case "loadHistory":
             this.sendHistory();
+            break;
+
+          case "openExternalLink":
+            vscode.env.openExternal(vscode.Uri.parse(message.payload));
             break;
         }
       },

@@ -24,8 +24,10 @@ export class DependencySearch {
   private allGroups: DependencyGroup[] = [];
   private currentBootVersion = "";
   private onChangeCallback: (ids: string[]) => void = () => {};
+  private onOpenLinkCallback: (url: string) => void = () => {};
   private focusedIndex = -1;
   private visibleItems: HTMLElement[] = [];
+  private activeTooltip: HTMLElement | null = null;
 
   constructor(
     private listContainer: HTMLElement,
@@ -131,11 +133,13 @@ export class DependencySearch {
   initialize(
     groups: DependencyGroup[],
     bootVersion: string,
-    onChange: (ids: string[]) => void
+    onChange: (ids: string[]) => void,
+    onOpenLink?: (url: string) => void
   ) {
     this.allGroups = groups;
     this.currentBootVersion = bootVersion;
     this.onChangeCallback = onChange;
+    if (onOpenLink) this.onOpenLinkCallback = onOpenLink;
     this.renderGroups(groups);
     this.updateBadges();
   }
@@ -309,6 +313,17 @@ export class DependencySearch {
     label.appendChild(checkbox);
     label.appendChild(info);
 
+    const infoBtn = document.createElement("button");
+    infoBtn.className = "dep-info-btn";
+    infoBtn.textContent = "\u24d8";
+    infoBtn.title = "상세 정보";
+    infoBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.showDepTooltip(dep, infoBtn);
+    });
+    label.appendChild(infoBtn);
+
     return label;
   }
 
@@ -356,6 +371,124 @@ export class DependencySearch {
     warning.textContent = `비호환 의존성 자동 해제: ${names.join(", ")}`;
     this.listContainer.prepend(warning);
     setTimeout(() => warning.remove(), 4000);
+  }
+
+  private showDepTooltip(dep: Dependency, anchor: HTMLElement) {
+    this.dismissTooltip();
+
+    const tooltip = document.createElement("div");
+    tooltip.className = "dep-tooltip";
+
+    // Header
+    const header = document.createElement("div");
+    header.className = "dep-tooltip-header";
+    const title = document.createElement("span");
+    title.className = "dep-tooltip-title";
+    title.textContent = dep.name;
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "dep-tooltip-close";
+    closeBtn.textContent = "\u00d7";
+    closeBtn.addEventListener("click", () => this.dismissTooltip());
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    tooltip.appendChild(header);
+
+    // Description
+    const desc = document.createElement("div");
+    desc.className = "dep-tooltip-desc";
+    desc.textContent = dep.description;
+    tooltip.appendChild(desc);
+
+    // ID
+    const idRow = document.createElement("div");
+    idRow.className = "dep-tooltip-row";
+    idRow.innerHTML = "";
+    const idLabel = document.createElement("span");
+    idLabel.className = "dep-tooltip-label";
+    idLabel.textContent = "ID";
+    const idCode = document.createElement("code");
+    idCode.className = "dep-tooltip-code";
+    idCode.textContent = dep.id;
+    idRow.appendChild(idLabel);
+    idRow.appendChild(idCode);
+    tooltip.appendChild(idRow);
+
+    // Version Range
+    if (dep.versionRange) {
+      const vrRow = document.createElement("div");
+      vrRow.className = "dep-tooltip-row";
+      const vrLabel = document.createElement("span");
+      vrLabel.className = "dep-tooltip-label";
+      vrLabel.textContent = "Version";
+      const vrCode = document.createElement("code");
+      vrCode.className = "dep-tooltip-code";
+      vrCode.textContent = dep.versionRange;
+      const compatible = isCompatible(dep.versionRange, this.currentBootVersion);
+      vrCode.classList.add(compatible ? "dep-tooltip-compat" : "dep-tooltip-incompat");
+      vrRow.appendChild(vrLabel);
+      vrRow.appendChild(vrCode);
+      tooltip.appendChild(vrRow);
+    }
+
+    // Links
+    if (dep.links && Object.keys(dep.links).length > 0) {
+      const linksDiv = document.createElement("div");
+      linksDiv.className = "dep-tooltip-links";
+      for (const [key, link] of Object.entries(dep.links)) {
+        const btn = document.createElement("button");
+        btn.className = "dep-tooltip-link";
+        btn.textContent = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ");
+        btn.addEventListener("click", () => {
+          const href = link.href.replace(/\{[^}]+\}/g, "");
+          this.onOpenLinkCallback(href);
+        });
+        linksDiv.appendChild(btn);
+      }
+      tooltip.appendChild(linksDiv);
+    }
+
+    // Position
+    const rect = anchor.getBoundingClientRect();
+    tooltip.style.position = "fixed";
+    tooltip.style.left = `${rect.right + 8}px`;
+    tooltip.style.top = `${rect.top}px`;
+
+    document.body.appendChild(tooltip);
+
+    // Viewport overflow check
+    requestAnimationFrame(() => {
+      const tr = tooltip.getBoundingClientRect();
+      if (tr.right > window.innerWidth) {
+        tooltip.style.left = `${rect.left - tr.width - 8}px`;
+      }
+      if (tr.bottom > window.innerHeight) {
+        tooltip.style.top = `${window.innerHeight - tr.height - 8}px`;
+      }
+    });
+
+    this.activeTooltip = tooltip;
+
+    const outsideClick = (e: MouseEvent) => {
+      if (!tooltip.contains(e.target as Node) && e.target !== anchor) {
+        this.dismissTooltip();
+        document.removeEventListener("mousedown", outsideClick);
+      }
+    };
+    const escHandler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        this.dismissTooltip();
+        document.removeEventListener("keydown", escHandler);
+      }
+    };
+    document.addEventListener("mousedown", outsideClick);
+    document.addEventListener("keydown", escHandler);
+  }
+
+  private dismissTooltip() {
+    if (this.activeTooltip) {
+      this.activeTooltip.remove();
+      this.activeTooltip = null;
+    }
   }
 
   getSelectedIds(): string[] {
