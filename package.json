@@ -1,6 +1,6 @@
 {
   "name": "spring-forge",
-  "displayName": "Spring Initializr UI",
+  "displayName": "Spring Forge",
   "description": "Visual Spring project generator powered by official start.spring.io API",
   "version": "1.0.2",
   "publisher": "chimaek",
