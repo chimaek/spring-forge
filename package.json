@@ -5,6 +5,7 @@
   "version": "1.0.2",
   "publisher": "chimaek",
   "license": "MIT",
+  "icon": "resources/image.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/chimaek/spring-forge"

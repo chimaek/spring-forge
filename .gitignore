@@ -6,4 +6,5 @@ out/
 docs/
 CLAUDE.md
 *.png
+!resources/image.png
 *.jpg
