@@ -10,6 +10,7 @@ esbuild.js
 CLAUDE.md
 **/*.ts
 **/*.png
+!resources/image.png
 **/*.jpg
 *.vsix
 !dist/**
