@@ -2,7 +2,7 @@
   "name": "spring-forge",
   "displayName": "Spring Initializr UI",
   "description": "Visual Spring project generator powered by official start.spring.io API",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "publisher": "chimaek",
   "license": "MIT",
   "repository": {
