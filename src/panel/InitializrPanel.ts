@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import { InitializrClient } from "../api/InitializrClient";
-import { GenerateOptions, Preset, HistoryRecord } from "../api/types";
+import { InitializrMetadata, GenerateOptions, Preset, HistoryRecord } from "../api/types";
 import { Downloader } from "../utils/downloader";
 import { getWebviewContent } from "./webviewContent";
 
@@ -11,7 +11,7 @@ const HISTORY_KEY = "springForge.history";
 const MAX_HISTORY = 5;
 
 type ExtensionToWebviewMessage =
-  | { command: "metadata"; payload: unknown }
+  | { command: "metadata"; payload: InitializrMetadata }
   | { command: "loading"; payload: boolean }
   | { command: "generating"; payload: boolean }
   | { command: "error"; payload: string }
@@ -131,7 +131,11 @@ export class InitializrPanel {
             break;
 
           case "openExternalLink":
-            vscode.env.openExternal(vscode.Uri.parse(message.payload));
+            try {
+              vscode.env.openExternal(vscode.Uri.parse(message.payload));
+            } catch {
+              console.error("[Spring Forge] 잘못된 URL:", message.payload);
+            }
             break;
         }
       },

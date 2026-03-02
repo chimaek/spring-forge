@@ -230,7 +230,11 @@ export function updateHistory(history: HistoryRecord[]) {
   for (let i = 0; i < history.length; i++) {
     const h = history[i];
     const date = new Date(h.generatedAt);
-    const label = `${h.options.artifactId} (${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")})`;
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const hh = String(date.getHours()).padStart(2, "0");
+    const mi = String(date.getMinutes()).padStart(2, "0");
+    const label = `${h.options.artifactId} (${mm}/${dd} ${hh}:${mi})`;
     const opt = document.createElement("option");
     opt.value = String(i);
     opt.textContent = label;

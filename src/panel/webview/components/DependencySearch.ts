@@ -468,26 +468,35 @@ export class DependencySearch {
 
     this.activeTooltip = tooltip;
 
+    const cleanup = () => {
+      document.removeEventListener("mousedown", outsideClick);
+      document.removeEventListener("keydown", escHandler);
+    };
     const outsideClick = (e: MouseEvent) => {
       if (!tooltip.contains(e.target as Node) && e.target !== anchor) {
         this.dismissTooltip();
-        document.removeEventListener("mousedown", outsideClick);
       }
     };
     const escHandler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         this.dismissTooltip();
-        document.removeEventListener("keydown", escHandler);
       }
     };
     document.addEventListener("mousedown", outsideClick);
     document.addEventListener("keydown", escHandler);
+    this.tooltipCleanup = cleanup;
   }
+
+  private tooltipCleanup: (() => void) | null = null;
 
   private dismissTooltip() {
     if (this.activeTooltip) {
       this.activeTooltip.remove();
       this.activeTooltip = null;
+    }
+    if (this.tooltipCleanup) {
+      this.tooltipCleanup();
+      this.tooltipCleanup = null;
     }
   }
 
