@@ -6,6 +6,8 @@ No more switching to the browser. Create Spring Boot projects with a full visual
 
 **[한국어](#한국어)** | English
 
+![Spring Forge Demo](https://raw.githubusercontent.com/chimaek/spring-forge/main/resources/demo.gif)
+
 ## Why Spring Forge?
 
 The existing `vscode-spring-initializr` extension uses a QuickPick (CLI-style) flow where you select options one at a time. That works, but it makes it hard to browse 140+ dependencies or compare options at a glance.
@@ -129,6 +131,8 @@ npx @vscode/vsce package --no-dependencies
 > VS Code 안에서 Spring Boot 프로젝트를 시각적 UI로 생성하는 확장 프로그램. [start.spring.io](https://start.spring.io) 공식 API 기반.
 
 브라우저로 전환할 필요 없이, 에디터에서 바로 Spring Boot 프로젝트를 만들 수 있습니다.
+
+![Spring Forge 데모](https://raw.githubusercontent.com/chimaek/spring-forge/main/resources/demo.gif)
 
 ## Spring Forge를 만든 이유
 
