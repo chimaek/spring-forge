@@ -32,6 +32,8 @@ The existing `vscode-spring-initializr` extension uses a QuickPick (CLI-style) f
 - **Custom server URL** — Configure `springForge.initializrUrl` to use a private/enterprise Initializr server instead of start.spring.io.
 - **Lightweight** — ~60KB VSIX. No React, no external CDN. Vanilla TypeScript + CSP-compliant.
 
+![Spring Forge UI](https://raw.githubusercontent.com/chimaek/spring-forge/main/resources/demo.png)
+
 ## Configuration
 
 | Setting | Default | Description |
@@ -157,6 +159,8 @@ npx @vscode/vsce package --no-dependencies
 - **테마 지원** — 다크/라이트/하이콘트라스트 테마 자동 대응.
 - **커스텀 서버 URL** — `springForge.initializrUrl` 설정으로 사내/프라이빗 Initializr 서버 연동 가능.
 - **경량** — VSIX ~60KB. React 없이 Vanilla TypeScript + CSP 준수.
+
+![Spring Forge UI](https://raw.githubusercontent.com/chimaek/spring-forge/main/resources/demo.png)
 
 ## 설정
 

@@ -13,8 +13,12 @@
   "engines": {
     "vscode": "^1.85.0"
   },
+  "galleryBanner": {
+    "color": "#6DB33F",
+    "theme": "dark"
+  },
   "categories": [
-    "Other"
+    "Programming Languages"
   ],
   "keywords": [
     "spring",
@@ -22,7 +26,9 @@
     "initializr",
     "java",
     "kotlin",
-    "project generator"
+    "project generator",
+    "gradle",
+    "maven"
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",

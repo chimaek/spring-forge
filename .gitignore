@@ -7,4 +7,5 @@ docs/
 CLAUDE.md
 *.png
 !resources/image.png
+!resources/demo.png
 *.jpg
