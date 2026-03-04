@@ -20,7 +20,7 @@ jobs:
       - run: npm run check-types
 
       - name: Sync version from tag
-        run: npm version ${GITHUB_REF#refs/tags/v} --no-git-tag-version
+        run: npm version ${GITHUB_REF#refs/tags/v} --no-git-tag-version --allow-same-version
 
       - name: Publish to Marketplace
         run: npx @vscode/vsce publish --no-dependencies
