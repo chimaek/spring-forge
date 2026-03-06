@@ -5,6 +5,41 @@ All notable changes to Spring Forge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-06
+
+### Added
+
+- **VS Code Walkthrough onboarding:**
+  step-by-step guide for first-time users — covers opening the panel, searching dependencies,
+  saving presets, and previewing/generating projects. Accessible via the Get Started tab.
+
+## [1.1.0] - 2026-03-05
+
+### Added
+
+- **Update notification (What's New):**
+  shows an information message after extension update with "View Changelog" button
+  that opens CHANGELOG.md in Markdown preview
+
+## [1.0.4] - 2026-03-04
+
+### Changed
+
+- **Marketplace metadata:**
+  added `galleryBanner` (Spring green `#6DB33F`), changed category from `Other` to `Programming Languages`,
+  added `gradle` and `maven` keywords
+- **CI workflow:**
+  changed `npm ci` to `npm install`, added `--allow-same-version` flag to version sync
+
+## [1.0.3] - 2026-03-03
+
+### Added
+
+- **Demo GIF/PNG in README:**
+  added `demo.gif` and `demo.png` to both English and Korean sections
+- **GitHub Actions auto-publish:**
+  tag push (`v*`) triggers automatic build and Marketplace deployment
+
 ## [1.0.2] - 2026-03-02
 
 ### Fixed

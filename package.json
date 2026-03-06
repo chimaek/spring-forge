@@ -79,6 +79,47 @@
         }
       ]
     },
+    "walkthroughs": [
+      {
+        "id": "spring-forge.getStarted",
+        "title": "Get Started with Spring Forge",
+        "description": "Create Spring Boot projects visually inside VS Code — powered by start.spring.io.",
+        "steps": [
+          {
+            "id": "openPanel",
+            "title": "Open Spring Forge",
+            "description": "Launch the visual project generator.\n\n[Open Spring Forge](command:spring-forge.open)\n\nYou can also use **Ctrl+Alt+S** (Mac: Cmd+Option+S) or click the Spring icon in the Activity Bar.",
+            "media": {
+              "markdown": "resources/walkthrough/open-panel.md"
+            }
+          },
+          {
+            "id": "searchDependencies",
+            "title": "Search Dependencies",
+            "description": "Press **/** to focus the search bar and find dependencies instantly.\n\nSearch by name, ID, or description — all 140+ dependencies are filtered in real time.",
+            "media": {
+              "markdown": "resources/walkthrough/search-dependencies.md"
+            }
+          },
+          {
+            "id": "savePreset",
+            "title": "Save a Preset",
+            "description": "Click **Save Preset** to store your favorite project configuration.\n\nReuse it anytime with one click — no need to reconfigure groupId, dependencies, and build type every time.",
+            "media": {
+              "markdown": "resources/walkthrough/save-preset.md"
+            }
+          },
+          {
+            "id": "previewAndGenerate",
+            "title": "Preview & Generate",
+            "description": "Click **Preview** to inspect the generated `pom.xml` or `build.gradle` before creating the project.\n\nWhen ready, click **Generate** to download, extract, and open your new Spring Boot project.",
+            "media": {
+              "markdown": "resources/walkthrough/preview-generate.md"
+            }
+          }
+        ]
+      }
+    ],
     "configuration": {
       "title": "Spring Forge",
       "properties": {

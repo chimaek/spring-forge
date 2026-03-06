@@ -30,6 +30,7 @@ The existing `vscode-spring-initializr` extension uses a QuickPick (CLI-style) f
 - **Activity Bar icon** — One-click access from the sidebar.
 - **Theme support** — Adapts to dark, light, and high-contrast themes using VS Code CSS variables.
 - **Custom server URL** — Configure `springForge.initializrUrl` to use a private/enterprise Initializr server instead of start.spring.io.
+- **Walkthrough onboarding** — Step-by-step Get Started guide for first-time users. Covers panel access, dependency search, presets, and project generation.
 - **Lightweight** — ~60KB VSIX. No React, no external CDN. Vanilla TypeScript + CSP-compliant.
 
 ![Spring Forge UI](https://raw.githubusercontent.com/chimaek/spring-forge/main/resources/demo.png)
@@ -158,6 +159,7 @@ npx @vscode/vsce package --no-dependencies
 - **Activity Bar 아이콘** — 사이드바에서 클릭 한 번으로 실행.
 - **테마 지원** — 다크/라이트/하이콘트라스트 테마 자동 대응.
 - **커스텀 서버 URL** — `springForge.initializrUrl` 설정으로 사내/프라이빗 Initializr 서버 연동 가능.
+- **Walkthrough 온보딩** — 첫 사용자를 위한 단계별 시작 가이드. 패널 열기, 의존성 검색, 프리셋 저장, 프로젝트 생성까지 안내.
 - **경량** — VSIX ~60KB. React 없이 Vanilla TypeScript + CSP 준수.
 
 ![Spring Forge UI](https://raw.githubusercontent.com/chimaek/spring-forge/main/resources/demo.png)
