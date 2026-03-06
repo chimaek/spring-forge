@@ -2,7 +2,7 @@
   "name": "spring-forge",
   "displayName": "Spring Forge",
   "description": "Visual Spring project generator powered by official start.spring.io API",
-  "version": "1.0.4",
+  "version": "1.2.0",
   "publisher": "chimaek",
   "license": "MIT",
   "icon": "resources/image.png",
